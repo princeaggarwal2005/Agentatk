@@ -1,0 +1,25 @@
+{
+  "name": "@keyvaluesystems/agent-opfor-test-agent-customer-support",
+  "version": "0.10.2",
+  "description": "Customer support test agent with PostgreSQL — tests BOLA, BFLA, RBAC, PII, and SQL injection evaluators",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env --import tsx/esm src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@langchain/anthropic": "^1.3.29",
+    "@langchain/core": "^1.1.48",
+    "@langchain/google-genai": "^2.1.31",
+    "@langchain/groq": "^1.2.1",
+    "@langchain/openai": "^1.4.7",
+    "@types/express": "^5.0.0",
+    "@types/pg": "^8.0.0",
+    "express": "^5.0.0",
+    "pg": "^8.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.3",
+    "zod": "^3.0.0"
+  }
+}
