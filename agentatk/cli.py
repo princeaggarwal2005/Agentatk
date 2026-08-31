@@ -50,6 +50,24 @@ def main():
         default=8080,
         help="Port to run the dashboard server on (default: 8080)",
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help="LLM model name to use for attacker reasoning and judge consensus (e.g. gpt-4o, llama-3.3-70b-versatile, deepseek-chat)",
+    )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default="",
+        help="Explicit API key override for LLM requests",
+    )
+    parser.add_argument(
+        "--base-url",
+        type=str,
+        default="",
+        help="Custom OpenAI-compatible API base URL (e.g. http://localhost:11434/v1)",
+    )
 
     args = parser.parse_args()
 
@@ -82,7 +100,7 @@ def main():
 
         print(f"[AUTONOMOUS RECON] Inspecting target codebase at: {target_path}\n")
 
-        client = ModelClient()
+        client = ModelClient(model=args.model, api_key=args.api_key, base_url=args.base_url)
 
         def cli_progress_logger(event_type: str, data: dict):
             if event_type == "phase_change":

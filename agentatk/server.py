@@ -179,6 +179,24 @@ def execute_background_scan(target_path: str):
         SCAN_STATE["status"] = "completed"
         SCAN_STATE["current_activity"] = f"✅ Audit Complete: {len(results_list)} paths tested, {failed_count} vulnerabilities verified."
 
+        # Persist audit scorecard and attack surface graph to Google Cloud Firestore (if configured)
+        try:
+            from agentatk.gcp_storage import gcp_store
+            audit_id = f"audit_{target_state.target_name}_{int(time.time())}"
+            gcp_store.save_audit_report(
+                audit_id=audit_id,
+                target_name=target_state.target_name,
+                results=results_list,
+                stats={
+                    "total_cases": len(results_list),
+                    "failed_cases": failed_count,
+                    "asr": SCAN_STATE["asr"],
+                },
+                graph_data=SCAN_STATE["graph"],
+            )
+        except Exception:
+            pass
+
     except Exception as e:
         SCAN_STATE["status"] = "error"
         SCAN_STATE["error"] = str(e)

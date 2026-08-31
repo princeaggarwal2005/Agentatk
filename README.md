@@ -3,6 +3,8 @@
 **A security scanner for AI agents that actually reads their code first.**
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square&logo=python)](https://python.org)
+[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-GenAI%20SDK-4285F4.svg?style=flat-square&logo=google)](https://ai.google.dev)
+[![Google Cloud Run](https://img.shields.io/badge/Google%20Cloud-Run%20%7C%20Firestore-34A853.svg?style=flat-square&logo=googlecloud)](https://cloud.google.com)
 [![OWASP](https://img.shields.io/badge/OWASP-LLM%20Top%2010-red.svg?style=flat-square)](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 [![MITRE ATLAS](https://img.shields.io/badge/MITRE-ATLAS%20Taxonomy-orange.svg?style=flat-square)](https://atlas.mitre.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
@@ -56,14 +58,11 @@ pip install -e .
 cp .env.example .env
 ```
 
-Add your preferred provider key to `.env`:
+Add your Gemini API key to `.env`:
 ```env
-# Fast low-latency inference for autonomous auditing:
-GROQ_API_KEY=your_groq_api_key_here
-# or
-CEREBRAS_API_KEY=your_cerebras_api_key_here
-# or
-OPENAI_API_KEY=your_openai_api_key_here
+# Powered by Google Gemini via official Google GenAI SDK:
+GEMINI_API_KEY=your_gemini_api_key_here
+MODEL=gemini-2.5-flash
 ```
 
 ---
@@ -97,7 +96,27 @@ python -m agentatk.cli serve --port 8085
 ```
 *Open [http://localhost:8085](http://localhost:8085) in your browser.*
 
-### Option 4: Drop Straight into Your Agent's Repo as a Submodule
+### Option 4: Deploy to Google Cloud Run (Serverless)
+
+Deploy AGENTATK directly to Google Cloud Run in one click:
+
+```bash
+./deploy_cloud_run.sh
+# (or on Windows: deploy_cloud_run.bat)
+```
+
+Or deploy manually via the Google Cloud CLI:
+```bash
+gcloud run deploy agentatk \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --set-env-vars GEMINI_API_KEY=$GEMINI_API_KEY
+```
+
+### Option 5: Drop Straight into Your Agent's Repo as a Submodule
 
 You can clone AGENTATK directly into your own agent project — it automatically detects and ignores its own files during reconnaissance:
 
