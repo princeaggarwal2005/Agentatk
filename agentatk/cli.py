@@ -87,8 +87,10 @@ def main():
             port += 1
 
         print(f"Starting AGENTATK Live Dashboard on http://localhost:{port} ...")
-        import webbrowser
-        webbrowser.open(f"http://localhost:{port}")
+        try:
+            webbrowser.open(f"http://localhost:{port}")
+        except Exception:
+            pass
         uvicorn.run(app, host="0.0.0.0", port=port)
         return
 
@@ -249,9 +251,22 @@ def main():
             SCAN_STATE["status"] = "completed"
             SCAN_STATE["current_activity"] = f"Audit Complete: {len(results_list)} paths tested, {vulnerable_count} vulnerabilities verified."
 
-            print("Launching live dashboard at http://localhost:8080 ...")
-            webbrowser.open("http://localhost:8080")
-            uvicorn.run(app, host="0.0.0.0", port=8080)
+            port = args.port
+            import socket
+            def is_port_in_use(p):
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    return s.connect_ex(('127.0.0.1', p)) == 0
+
+            while is_port_in_use(port) and port < args.port + 20:
+                print(f"[NOTE] Port {port} is already in use. Trying {port + 1}...")
+                port += 1
+
+            print(f"Launching live dashboard at http://localhost:{port} ...")
+            try:
+                webbrowser.open(f"http://localhost:{port}")
+            except Exception:
+                pass
+            uvicorn.run(app, host="0.0.0.0", port=port)
 
         sys.exit(1 if findings else 0)
 

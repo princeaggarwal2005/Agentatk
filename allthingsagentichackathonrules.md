@@ -166,7 +166,7 @@ Follow these steps to go from sign-up to submission in a weekend and lean on the
 
     Get your tools. Sign up for a no-cost Google Cloud trial, then grab your $150 in Google Cloud credits using the credit form on the Resources tab.
     Learn the basics. New to agents? The beginner guides in Resources walk you through what an agent is and how to build your first one with ADK — no experience required.
-    Pick a track. Choose the one that fits your idea: The Taskmaster, The Collaborative Partner, or The Fortified Enterprise Fleet. Enter any track you like — full track breakdowns are waiting in Resources.
+    Pick a track. Choose the one that fits your idea: The Taskmasterg, The Collaborative Partner, or The Fortified Enterprise Fleet. Enter any track you like — full track breakdowns are waiting in Resources.
     Build on Gemini + Google Cloud. Keep your spend low with the cost-saving tips in Resources.
     Submit before the deadline: a demo video, your code repo, an architecture diagram, and a short write-up. Full checklist below under "What to Submit."
 

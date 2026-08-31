@@ -7,12 +7,8 @@ echo ==========================================================================
 echo           AGENTATK: Deploying to Google Cloud Run (Serverless)            
 echo ==========================================================================
 
-where gcloud >nul 2>nul
-if %errorlevel% neq 0 (
-    echo [ERROR] Google Cloud SDK ('gcloud') is not installed or not in PATH.
-    echo Install it from: https://cloud.google.com/sdk/docs/install
-    exit /b 1
-)
+where gcloud >nul 2>&1
+if errorlevel 1 goto :no_gcloud
 
 set /p PROJECT_ID="Enter your Google Cloud Project ID: "
 if "%PROJECT_ID%"=="" (
@@ -23,7 +19,7 @@ if "%PROJECT_ID%"=="" (
 set REGION=us-central1
 set SERVICE_NAME=agentatk
 
-echo [1/3] Enabling required Google Cloud APIs (Cloud Run, Cloud Build, Firestore)...
+echo [1/3] Enabling required Google Cloud APIs...
 call gcloud services enable run.googleapis.com cloudbuild.googleapis.com firestore.googleapis.com --project="%PROJECT_ID%"
 
 echo [2/3] Building and deploying AGENTATK directly to Google Cloud Run...
@@ -35,3 +31,14 @@ call gcloud run services describe %SERVICE_NAME% --platform managed --region %RE
 echo ==========================================================================
 echo Deployment finished. Visit the URL above to access AGENTATK on Cloud Run!
 echo ==========================================================================
+exit /b 0
+
+:no_gcloud
+echo.
+echo [NOTE] Google Cloud SDK CLI is not installed or not found in PATH.
+echo To deploy to Google Cloud Run:
+echo 1. Install Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+echo 2. Run: gcloud init
+echo 3. Re-run: deploy_cloud_run.bat (or deploy_cloud_run.ps1)
+echo.
+exit /b 1

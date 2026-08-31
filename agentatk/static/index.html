@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGENTATK — Autonomous AI Security Researcher Console</title>
+  
+  <!-- Premium Typography: Inter (UI) & JetBrains Mono (Data/Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Vis Network for Attack Surface DAG -->
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <!-- Security Console Design System -->
+  <link rel="stylesheet" href="/static/css/console.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- LEFT COMMAND RAIL (240px) -->
+    <aside class="sidebar">
+      <div>
+        <!-- Brand Header -->
+        <div class="sidebar-brand">
+          <div class="brand-icon">🛡️</div>
+          <div>
+            <div style="display: flex; align-items: center;">
+              <span class="brand-title">AGENTATK</span>
+              <span class="brand-badge">PRO</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 1px;">AI Security Engine</div>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="sidebar-nav">
+          <a class="nav-item active" id="nav-overview">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span>Live Console</span>
+          </a>
+          <a class="nav-item" id="nav-topology">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/><path d="M6 9v6"/></svg>
+            <span>Attack Surface</span>
+          </a>
+          <a class="nav-item" id="nav-ledger">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Vulnerability Feed</span>
+          </a>
+          <a class="nav-item" id="nav-remediation">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <span>Remediation Diff</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Bottom Subsystem Status Card -->
+      <div class="sidebar-status-card">
+        <div class="subsystem-header">
+          <div class="subsystem-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Research Engine</span>
+          </div>
+          <span id="sidebar-status-badge" class="status-badge-mini ready">STANDBY</span>
+        </div>
+        <div class="striped-progress-track">
+          <div id="sidebar-progress-bar" class="striped-progress-bar"></div>
+        </div>
+        <div class="subsystem-footer">
+          <span>Telemetry Buffer</span>
+          <span id="sidebar-progress-meta">0 / 0 Evaluated</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="breadcrumb-trail">
+            <span>Audits</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-active">Active Session</span>
+          </div>
+        </div>
+
+        <div class="topbar-controls">
+          <!-- Target Input -->
+          <div class="target-input-group">
+            <svg class="target-input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <input id="target-path-input" type="text" value="./targets/home-llm" placeholder="Path to target agent directory..." class="target-input-field">
+          </div>
+
+          <!-- Run Audit Action Button -->
+          <button id="btn-run-audit" onclick="window.triggerScan()" class="btn-run-audit">
+            <span id="btn-run-icon">▶</span>
+            <span id="btn-run-text">Run Security Audit</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        
+        <!-- Live Activity Telemetry Bar -->
+        <div class="telemetry-ticker">
+          <div class="ticker-left">
+            <span id="ticker-dot" class="ticker-dot"></span>
+            <span id="ticker-text" class="ticker-text">Autonomous research engine initialized. Awaiting target specification.</span>
+          </div>
+          <div class="ticker-right">
+            <span id="status-pill" class="pill-status idle">IDLE</span>
+          </div>
+        </div>
+
+        <!-- 4-Tile KPI Grid -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Target Agent</span>
+            <div id="kpi-target" class="kpi-value" style="font-size: 20px; font-family: var(--font-sans); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">—</div>
+            <div class="kpi-meta">
+              <span>Autonomous Discovery</span>
+              <span style="color: var(--accent-cyan);">Active</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Attack Success Rate (ASR)</span>
+            <div id="kpi-asr" class="kpi-value">0.0%</div>
+            <div class="kpi-meta">
+              <span>Compromises / Evaluated</span>
+              <span>Metric</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Verified Vulnerabilities</span>
+            <div id="kpi-vuln" class="kpi-value">0</div>
+            <div class="kpi-meta">
+              <span id="kpi-vuln-meta">0 Invariant Failures</span>
+              <span style="color: var(--vuln-red-light);">Confirmed</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Attack Paths Pipeline</span>
+            <div id="kpi-paths" class="kpi-value cyan">0 / 0</div>
+            <div class="kpi-meta">
+              <span id="kpi-paths-meta">0% Execution Coverage</span>
+              <span>Probes</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- SPLIT ANALYTICAL WORKSPACE -->
+        <section class="workspace-grid">
+          
+          <!-- LEFT SECTION: Attack Surface & Invariant Ledger -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Attack Surface Topology Panel -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title-group">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span class="panel-title">Attack Surface Graph</span>
+                  <span id="node-count-badge" class="panel-badge">0 nodes</span>
+                </div>
+                <div class="panel-actions">
+                  <button onclick="window.resetGraph()" class="btn-panel-action" title="Fit to Viewport">Fit</button>
+                  <button id="physics-btn" onclick="window.togglePhysics()" class="btn-panel-action" title="Toggle Layout Physics">Physics: Off</button>
+                </div>
+              </div>
+
+              <!-- Vis Graph Container -->
+              <div class="topology-container">
+                <div id="vis-graph-canvas"></div>
+              </div>
+
+              <!-- Topology Legend -->
+              <div class="topology-legend">
+                <div class="legend-item"><span class="legend-dot" style="background: var(--accent-cyan);"></span><span>Ingress Source</span></div>
+                <div class="legend-item"><span class="legend-diamond" style="background: var(--vuln-red);"></span><span>Tier 0 Sink (Crit)</span></div>
+                <div class="legend-item"><span class="legend-square" style="background: var(--warn-amber);"></span><span>Tier 1 Sink (Mod)</span></div>
+                <div class="legend-item"><span class="legend-square" style="background: #475569;"></span><span>Tier 2 Sink (Low)</span></div>
+                <div class="legend-item"><span class="legend-line" style="background: var(--vuln-red);"></span><span>Exploited Path</span></div>
+                <div class="legend-item"><span class="legend-line" style="background: var(--safe-green);"></span><span>Resisted Path</span></div>
+                <div style="margin-left: auto; color: var(--text-dim);" id="graph-status-text">Stabilized & Pinned</div>
+              </div>
+            </div>
+
+            <!-- Invariant Probe Ledger Panel -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title-group">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  <span class="panel-title">Planned & Tested Attack Hypotheses</span>
+                  <span id="ledger-count-badge" class="panel-badge">0</span>
+                </div>
+                
+                <!-- Filter Pills -->
+                <div class="segmented-track">
+                  <button id="filter-all-btn" onclick="window.filterLedger('all')" class="seg-btn active-all">All</button>
+                  <button id="filter-vuln-btn" onclick="window.filterLedger('vulnerable')" class="seg-btn">Vulnerable</button>
+                  <button id="filter-safe-btn" onclick="window.filterLedger('secure')" class="seg-btn">Secured</button>
+                </div>
+              </div>
+
+              <!-- Search Bar -->
+              <div class="ledger-controls">
+                <div style="position: relative; width: 100%;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input id="ledger-search-input" type="text" placeholder="Filter hypotheses by title, channel, tier, or ID (⌘K)..." style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-hairline); border-radius: var(--radius-sm); padding: 6px 10px 6px 28px; font-size: 11px; font-family: var(--font-sans); color: var(--text-primary); outline: none;">
+                </div>
+              </div>
+
+              <!-- Feed List -->
+              <div id="ledger-container" class="ledger-list">
+                <div style="padding: 36px 16px; text-align: center; color: #64748b; font-size: 12px; font-style: italic;">
+                  Awaiting audit execution...
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT SECTION: Forensic Inspector & Remediation Console -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <span class="panel-title">Forensic Evidence & Invariant Inspector</span>
+              </div>
+              <span id="inspector-case-badge" class="panel-badge" style="color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3);">Select test case</span>
+            </div>
+
+            <!-- Inspector Body -->
+            <div id="inspector-body" class="inspector-body">
+              <div style="padding: 48px 24px; text-align: center; color: #64748b; font-size: 12px; line-height: 1.6;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 12px; opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Select any attack hypothesis from the ledger or click an attack graph node to inspect forensic traces, multi-judge invariant verdicts, and verified remediation diffs.
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Main ES Module Script -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

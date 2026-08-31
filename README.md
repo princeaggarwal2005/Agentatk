@@ -44,11 +44,23 @@ Most red-teaming tools throw a static list of generic "jailbreak" prompts at an 
 
 ## Quick Start
 
-### 1. Clone & Install
+### 1. Clone & Setup Virtual Environment
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/princeaggarwal2005/Agentatk.git
 cd Agentatk
+
+# 2. Create and activate a virtual environment
+# On Windows (PowerShell):
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# On macOS / Linux:
+# python3 -m venv .venv
+# source .venv/bin/activate
+
+# 3. Install in editable mode
 pip install -e .
 ```
 
@@ -62,47 +74,67 @@ Add your Gemini API key to `.env`:
 ```env
 # Powered by Google Gemini via official Google GenAI SDK:
 GEMINI_API_KEY=your_gemini_api_key_here
-MODEL=gemini-2.5-flash
+MODEL=gemini-3.6-flash  #any model you want to use
 ```
 
 ---
 
-## How to Use
+## How to Test & Use
 
-### Option 1: Run a CLI Scan
+### Step A: Test the Built-in Sample Agents (in `targets/`)
 
-Scan any agent repository or directory directly from your terminal:
+AGENTATK comes preloaded with targets like `home-llm` (Smart Home Agent) and `customer-support` (LangChain Support Agent).
 
-```bash
-agentatk scan ./path/to/target-agent
-# or
-python -m agentatk.cli scan ./path/to/target-agent
-```
-
-### Option 2: Scan with the Live Visual Dashboard
-
-Audit the target and automatically stream live progress and the interactive attack graph into your browser:
-
-```bash
-agentatk scan ./path/to/target-agent --ui
-```
-
-### Option 3: Direct Dashboard Mode
-
-Directly open the visual workspace to inspect the attack surface, trigger scans, and test custom agent paths:
-
+#### Option 1: Live Interactive Web Dashboard (Recommended)
 ```bash
 python -m agentatk.cli serve --port 8085
 ```
-*Open [http://localhost:8085](http://localhost:8085) in your browser.*
+1. Open **`http://localhost:8085`** in your browser.
+2. Ensure the path is set to `./targets/home-llm` (or `./targets/customer-support`).
+3. Click **"▶ Run Security Audit"**.
+4. Watch the attack graph render, tests queue up (`⏳ QUEUED`), probe in real-time (`⚡ AUDITING...`), and resolve with 1-click PoCs & diff patches.
 
-### Option 4: Deploy to Google Cloud Run (Serverless)
+#### Option 2: Direct Terminal CLI Scan
+```bash
+# Scan smart home agent:
+agentatk scan ./targets/home-llm
+
+# Or scan customer support agent:
+agentatk scan ./targets/customer-support
+```
+
+---
+
+### Step B: Test Your OWN Custom Agent
+
+#### Method 1: Point directly to your agent's directory
+```bash
+agentatk scan /path/to/your-agent-folder
+```
+*Or open the Web Dashboard (`agentatk serve`), enter `/path/to/your-agent-folder` in the top path input, and click "Run Security Audit".*
+
+#### Method 2: Embed AGENTATK directly inside your agent repo
+Clone AGENTATK straight into your agent project — it automatically detects and ignores its own files during reconnaissance:
+
+```bash
+cd my-agent-project/
+git clone https://github.com/princeaggarwal2005/Agentatk.git .agentatk
+python -m .agentatk.agentatk.cli scan . --ui
+```
+
+---
+
+### Step C: Deploy to Google Cloud Run (Serverless)
 
 Deploy AGENTATK directly to Google Cloud Run in one click:
 
 ```bash
+# On Linux / macOS:
 ./deploy_cloud_run.sh
-# (or on Windows: deploy_cloud_run.bat)
+
+# On Windows PowerShell:
+.\deploy_cloud_run.ps1
+# (or Windows CMD: deploy_cloud_run.bat)
 ```
 
 Or deploy manually via the Google Cloud CLI:
@@ -116,17 +148,9 @@ gcloud run deploy agentatk \
   --set-env-vars GEMINI_API_KEY=$GEMINI_API_KEY
 ```
 
-### Option 5: Drop Straight into Your Agent's Repo as a Submodule
+---
 
-You can clone AGENTATK directly into your own agent project — it automatically detects and ignores its own files during reconnaissance:
-
-```bash
-cd my-agent-project/
-git clone https://github.com/princeaggarwal2005/Agentatk.git .agentatk
-python -m .agentatk.agentatk.cli scan . --ui
-```
-
-### Run the Test Suite
+### Step D: Run the Test Suite
 
 ```bash
 pytest tests
